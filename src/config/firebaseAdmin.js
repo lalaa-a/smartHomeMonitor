@@ -7,13 +7,17 @@ import { getDatabase } from 'firebase-admin/database';
 import { getMessaging } from 'firebase-admin/messaging';
 
 function loadServiceAccount() {
+
+  /*
   const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
   if (!credentialsPath) {
     throw new Error(
       'GOOGLE_APPLICATION_CREDENTIALS env var is required: path to a Firebase service account JSON file.'
     );
   }
-  const resolved = path.resolve(credentialsPath);
+
+  */
+  const resolved = process.env.GOOGLE_APPLICATION_CREDENTIALS;
   if (!fs.existsSync(resolved)) {
     throw new Error(`Service account file not found at ${resolved}.`);
   }
