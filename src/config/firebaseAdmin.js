@@ -7,24 +7,33 @@ import { getDatabase } from 'firebase-admin/database';
 import { getMessaging } from 'firebase-admin/messaging';
 
 function loadServiceAccount() {
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
 
-  /*
+  if (raw) {
+    // JSON pasted directly into the env var (Railway, or a .env with the whole object as the value)
+    try {
+      return JSON.parse(raw);
+    } catch (err) {
+      throw new Error(`Failed to parse FIREBASE_SERVICE_ACCOUNT: ${err.message}`);
+    }
+  }
+
+  // Fallback: path to a JSON file on disk (useful for local dev if you keep a local file)
   const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
   if (!credentialsPath) {
     throw new Error(
-      'GOOGLE_APPLICATION_CREDENTIALS env var is required: path to a Firebase service account JSON file.'
+      'Set either FIREBASE_SERVICE_ACCOUNT (JSON contents) or GOOGLE_APPLICATION_CREDENTIALS (file path).'
     );
   }
 
-  */
-  const resolved = process.env.GOOGLE_APPLICATION_CREDENTIALS;
-  if (!fs.existsSync(resolved)) {
-    throw new Error(`Service account file not found at ${resolved}.`);
+  if (!fs.existsSync(credentialsPath)) {
+    throw new Error(`Service account file not found at ${credentialsPath}.`);
   }
+
   try {
-    return JSON.parse(fs.readFileSync(resolved, 'utf8'));
+    return JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
   } catch (err) {
-    throw new Error(`Failed to parse service account file at ${resolved}: ${err.message}`);
+    throw new Error(`Failed to parse service account file at ${credentialsPath}: ${err.message}`);
   }
 }
 
